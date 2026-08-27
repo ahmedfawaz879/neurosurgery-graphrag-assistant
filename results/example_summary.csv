@@ -1,0 +1,5 @@
+system,citation_attribution_acc,gap_resolution_acc,global_coverage_recall,false_attribution_rate
+graphrag_global_only,0.2857142857142857,1.0,0.19444444444444442,
+graphrag_local_only,0.06363636363636364,0.5,,0.0
+local_query_only,0.4444444444444444,0.75,0.1111111111111111,0.0
+orchestrated,0.38095238095238093,0.8,0.19444444444444442,0.0

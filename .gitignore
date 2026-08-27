@@ -1,0 +1,34 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+.env
+.claude/
+
+# Generated at runtime / by the harness -- not committed, except the real
+# notebook-produced examples used by the README.
+results/*
+!results/example_run.csv
+!results/example_summary.csv
+!results/figures/
+results/figures/*
+!results/figures/gaprag_metrics_by_system.png
+
+# Generated graph artifact (rebuilt via `--rebuild` CLI flag, LLM-derived)
+data/graph/*.graphml
+
+# Local vector-store / model caches
+qdrant_storage/
+.cache/
+*.log
+
+# Original source inputs (already copied into notebooks/ and results/)
+/graphrag-research-assistant*.ipynb
+/results (*).zip
