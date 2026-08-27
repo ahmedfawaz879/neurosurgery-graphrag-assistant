@@ -6,13 +6,14 @@ MockEmbedding, generation uses a fake backend.
 
 from __future__ import annotations
 
+import pytest
 from llama_index.core import Settings
-from llama_index.core.embeddings import MockEmbedding
+from llama_index.core.embeddings import BaseEmbedding, MockEmbedding
 from llama_index.core.node_parser import SentenceSplitter
 
 from src.config import Config
 from src.data.schemas import Paper
-from src.ingestion.index_build import build_index, papers_to_documents
+from src.ingestion.index_build import build_index, configure_embed_model, papers_to_documents
 from src.retrieval.local_query import LocalQueryEngine
 from src.retrieval.result import QueryResult
 
@@ -65,3 +66,65 @@ def test_local_query_returns_nonempty_retrieved_paper_ids(mocker):
     assert result.answer == "Mocked answer attributing the claim to paper_a."
     assert result.latency_s >= 0
     fake_backend.generate.assert_called_once()
+
+
+# ---- embeddings quota fallback (Rule: a SEPARATE OpenAI dependency from chat
+# completions -- see src/ingestion/index_build.py's configure_embed_model()) -----
+
+
+def test_configure_embed_model_falls_back_to_local_on_quota_error(mocker):
+    mock_openai_embed = mocker.Mock(spec=BaseEmbedding)
+    mock_openai_embed.get_text_embedding.side_effect = RuntimeError(
+        "Error code: 429 - You exceeded your current quota, insufficient_quota"
+    )
+    mocker.patch("llama_index.embeddings.openai.OpenAIEmbedding", return_value=mock_openai_embed)
+
+    fake_local_embed = mocker.Mock(spec=BaseEmbedding)
+    mock_hf_cls = mocker.patch(
+        "llama_index.embeddings.huggingface.HuggingFaceEmbedding", return_value=fake_local_embed
+    )
+
+    config = Config(USE_OPENAI=True, OPENAI_API_KEY="sk-test")
+    backend_name = configure_embed_model(config)
+
+    assert backend_name == "local"
+    mock_hf_cls.assert_called_once_with(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    assert Settings.embed_model is fake_local_embed
+
+
+def test_configure_embed_model_uses_openai_when_probe_succeeds(mocker):
+    mock_openai_embed = mocker.Mock(spec=BaseEmbedding)
+    mock_openai_embed.get_text_embedding.return_value = [0.1] * 1536
+    mocker.patch("llama_index.embeddings.openai.OpenAIEmbedding", return_value=mock_openai_embed)
+
+    config = Config(USE_OPENAI=True, OPENAI_API_KEY="sk-test")
+    backend_name = configure_embed_model(config)
+
+    assert backend_name == "openai"
+    assert Settings.embed_model is mock_openai_embed
+
+
+def test_configure_embed_model_reraises_non_quota_error(mocker):
+    mock_openai_embed = mocker.Mock(spec=BaseEmbedding)
+    mock_openai_embed.get_text_embedding.side_effect = ValueError("an unrelated bug")
+    mocker.patch("llama_index.embeddings.openai.OpenAIEmbedding", return_value=mock_openai_embed)
+
+    config = Config(USE_OPENAI=True, OPENAI_API_KEY="sk-test")
+
+    with pytest.raises(ValueError, match="an unrelated bug"):
+        configure_embed_model(config)
+
+
+def test_configure_embed_model_goes_straight_to_local_when_use_openai_false(mocker):
+    fake_local_embed = mocker.Mock(spec=BaseEmbedding)
+    mock_hf_cls = mocker.patch(
+        "llama_index.embeddings.huggingface.HuggingFaceEmbedding", return_value=fake_local_embed
+    )
+    mock_openai_cls = mocker.patch("llama_index.embeddings.openai.OpenAIEmbedding")
+
+    config = Config(USE_OPENAI=False)
+    backend_name = configure_embed_model(config)
+
+    assert backend_name == "local"
+    mock_hf_cls.assert_called_once()
+    mock_openai_cls.assert_not_called()
