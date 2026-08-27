@@ -1,0 +1,39 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      QDRANT_URL: http://qdrant:6333
+      GRAPH_BACKEND: networkx
+      ALLOWED_ORIGIN: ${ALLOWED_ORIGIN:-*}
+    depends_on:
+      - qdrant
+    volumes:
+      - ./data:/app/data
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+  # Opt-in only -- NetworkX is the default graph backend (Config.GRAPH_BACKEND, see
+  # src/graphrag/neo4j_export.py), so nothing in this compose file needs Neo4j to run.
+  # Uncomment to run a local Neo4j instance for testing push_to_neo4j() against a real
+  # server, then set GRAPH_BACKEND=neo4j and NEO4J_URI=bolt://neo4j:7687 on `api`.
+  # neo4j:
+  #   image: neo4j:5.24
+  #   ports:
+  #     - "7474:7474"
+  #     - "7687:7687"
+  #   environment:
+  #     NEO4J_AUTH: neo4j/changeme
+  #   volumes:
+  #     - neo4j_data:/data
+
+volumes:
+  qdrant_storage:
+  # neo4j_data:

@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check src tests scripts
+
+      - name: Test
+        # No live OpenAI/Qdrant/Neo4j calls are made here -- every test mocks the
+        # LLM/embedding/graph dependency it touches (see the README's Honesty /
+        # Limitations section and tests/test_llm_backend.py's quota-fallback tests).
+        run: pytest -q
+        env:
+          USE_OPENAI: "false"

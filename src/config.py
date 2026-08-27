@@ -55,7 +55,10 @@ class Config:
             LOCAL_MODEL_ID=os.environ.get("LOCAL_MODEL_ID", "Qwen/Qwen2.5-1.5B-Instruct"),
             CORPUS_MODE=os.environ.get("CORPUS_MODE", "shipped"),
             REAL_PDF_DIR=os.environ.get("REAL_PDF_DIR", "/kaggle/input/your-neurosurgery-ai-papers"),
-            QDRANT_MODE=os.environ.get("QDRANT_MODE", ":memory:"),
+            # QDRANT_URL is the deployment-facing env var name (docker-compose.yml,
+            # render.yaml, fly.toml); QDRANT_MODE is kept as a fallback alias
+            # matching the notebook's own variable name.
+            QDRANT_MODE=os.environ.get("QDRANT_URL") or os.environ.get("QDRANT_MODE", ":memory:"),
             VECTOR_DB=os.environ.get("VECTOR_DB", "qdrant"),
             PINECONE_API_KEY=os.environ.get("PINECONE_API_KEY", ""),
             PINECONE_INDEX_NAME=os.environ.get("PINECONE_INDEX_NAME", "neurosurgery-ai-papers"),
