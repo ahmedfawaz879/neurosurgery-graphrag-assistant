@@ -29,6 +29,8 @@ qdrant_storage/
 .cache/
 *.log
 
-# Original source inputs (already copied into notebooks/ and results/)
+# Original source inputs (not tracked in this repo -- see results/ for the
+# real, extracted run artifacts)
 /graphrag-research-assistant*.ipynb
 /results (*).zip
+*.ipynb

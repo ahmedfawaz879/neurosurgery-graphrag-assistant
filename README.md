@@ -114,9 +114,8 @@ methodology, not a claim of statistical significance between systems — see boo
 
 ## Honesty / Limitations
 
-> Reproduced verbatim from the source notebook's Sections 12–13
-> (`notebooks/neurosurgery_graphrag_assistant.ipynb`) — this project's credibility argument rests on
-> being as clear about its own limits as about what it claims to do.
+> Reproduced verbatim from the original prototyping notebook's Sections 12–13 — this project's
+> credibility argument rests on being as clear about its own limits as about what it claims to do.
 
 ### Discussion & Limitations
 
@@ -179,7 +178,6 @@ neurosurgery-graphrag-assistant/
 │   ├── reporting/               # aggregation + bar-with-CI plots
 │   └── api/                     # FastAPI service (POST /ask, /health, /)
 ├── data/                          # gap taxonomy, literature corpus, QA set
-├── notebooks/                      # the canonical narrative notebook
 ├── results/                         # example_run.csv / example_summary.csv (real)
 ├── static/index.html                 # single-file, dependency-free chat UI
 ├── scripts/generate_report.py

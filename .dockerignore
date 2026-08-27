@@ -6,7 +6,6 @@ __pycache__/
 .git/
 .github/
 .claude/
-notebooks/
 tests/
 results/
 *.zip
