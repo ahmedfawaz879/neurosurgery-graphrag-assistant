@@ -31,6 +31,8 @@ class Config:
 
     QDRANT_MODE: str = ":memory:"  # or a URL like "http://qdrant:6333" in production
     VECTOR_DB: str = "qdrant"  # "qdrant" | "pinecone"
+    PINECONE_API_KEY: str = ""
+    PINECONE_INDEX_NAME: str = "neurosurgery-ai-papers"
 
     GRAPH_BACKEND: str = "networkx"  # "networkx" | "neo4j"
     NEO4J_URI: str = ""
@@ -55,6 +57,8 @@ class Config:
             REAL_PDF_DIR=os.environ.get("REAL_PDF_DIR", "/kaggle/input/your-neurosurgery-ai-papers"),
             QDRANT_MODE=os.environ.get("QDRANT_MODE", ":memory:"),
             VECTOR_DB=os.environ.get("VECTOR_DB", "qdrant"),
+            PINECONE_API_KEY=os.environ.get("PINECONE_API_KEY", ""),
+            PINECONE_INDEX_NAME=os.environ.get("PINECONE_INDEX_NAME", "neurosurgery-ai-papers"),
             GRAPH_BACKEND=os.environ.get("GRAPH_BACKEND", "networkx"),
             NEO4J_URI=os.environ.get("NEO4J_URI", ""),
             NEO4J_USER=os.environ.get("NEO4J_USER", ""),
