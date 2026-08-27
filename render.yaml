@@ -1,0 +1,35 @@
+# Render Blueprint -- https://render.com/docs/blueprint-spec
+#
+# One deployable web service, built from this repo's Dockerfile. Qdrant is NOT a
+# second service in this Blueprint -- it defaults to Qdrant Cloud's free tier
+# (external, managed) so this stays a single-click deploy. See
+# docs/ARCHITECTURE.md's "Qdrant hosting for a cloud deployment" section for the
+# self-hosted-second-service alternative, and for why Qdrant Cloud is the default.
+#
+# COST / RATE-LIMIT WARNING: every /ask request makes a real, billed OpenAI API
+# call with no caching layer in this version. Keep the app's built-in rate limiter
+# in place (see src/api/main.py, docs/ARCHITECTURE.md) and/or set an OpenAI usage
+# cap on the account before sharing a deployed link publicly.
+#
+# NOTE: the `free` plan sleeps after a period of inactivity -- the first request
+# after a quiet period cold-starts (tens of seconds). Acceptable for a portfolio
+# demo; change `plan` to `starter` (or higher) below to avoid it.
+
+services:
+  - type: web
+    name: neurosurgery-graphrag-assistant
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false # set manually in the Render dashboard -- never committed
+      - key: QDRANT_URL
+        sync: false # your Qdrant Cloud cluster's HTTPS endpoint
+      - key: QDRANT_API_KEY
+        sync: false # your Qdrant Cloud API key
+      - key: GRAPH_BACKEND
+        value: networkx
+      - key: ALLOWED_ORIGIN
+        value: "*" # tighten to your deployed frontend's exact origin in production

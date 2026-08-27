@@ -30,6 +30,7 @@ class Config:
     REAL_PDF_DIR: str = "/kaggle/input/your-neurosurgery-ai-papers"
 
     QDRANT_MODE: str = ":memory:"  # or a URL like "http://qdrant:6333" in production
+    QDRANT_API_KEY: str = ""  # required for Qdrant Cloud; unused for a self-hosted instance
     VECTOR_DB: str = "qdrant"  # "qdrant" | "pinecone"
     PINECONE_API_KEY: str = ""
     PINECONE_INDEX_NAME: str = "neurosurgery-ai-papers"
@@ -59,6 +60,7 @@ class Config:
             # render.yaml, fly.toml); QDRANT_MODE is kept as a fallback alias
             # matching the notebook's own variable name.
             QDRANT_MODE=os.environ.get("QDRANT_URL") or os.environ.get("QDRANT_MODE", ":memory:"),
+            QDRANT_API_KEY=os.environ.get("QDRANT_API_KEY", ""),
             VECTOR_DB=os.environ.get("VECTOR_DB", "qdrant"),
             PINECONE_API_KEY=os.environ.get("PINECONE_API_KEY", ""),
             PINECONE_INDEX_NAME=os.environ.get("PINECONE_INDEX_NAME", "neurosurgery-ai-papers"),

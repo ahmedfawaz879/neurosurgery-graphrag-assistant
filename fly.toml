@@ -1,0 +1,57 @@
+# Fly.io app config -- https://fly.io/docs/reference/configuration/
+#
+# `fly launch` (first time) or `fly deploy` builds this repo's Dockerfile and
+# deploys it as a single app. Qdrant defaults to Qdrant Cloud's free tier
+# (external, managed) -- see docs/ARCHITECTURE.md's "Qdrant hosting for a cloud
+# deployment" section for the self-hosted-second-Fly-app alternative.
+#
+# Secrets (OPENAI_API_KEY, QDRANT_URL, QDRANT_API_KEY) are NOT set here -- set
+# them once via the Fly CLI before the first deploy:
+#   fly secrets set OPENAI_API_KEY=sk-... QDRANT_URL=https://your-cluster.qdrant.io QDRANT_API_KEY=...
+# (see the README's Deploy section for the full one-time setup).
+#
+# COST / RATE-LIMIT WARNING: every /ask request makes a real, billed OpenAI API
+# call with no caching layer in this version. Keep the app's built-in rate
+# limiter in place and/or set an OpenAI usage cap before sharing a deployed
+# link publicly (see docs/ARCHITECTURE.md).
+
+app = "neurosurgery-graphrag-assistant"
+primary_region = "iad"
+
+[build]
+
+[env]
+  GRAPH_BACKEND = "networkx"
+  ALLOWED_ORIGIN = "*" # tighten to your deployed frontend's exact origin in production
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[services]]
+  internal_port = 8000
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [[services.http_checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "get"
+    path = "/health"
+    protocol = "http"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 1024

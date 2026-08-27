@@ -101,19 +101,24 @@ are documented in detail below.
 
 Two options, either is fine for a portfolio-scale deployment:
 
-1. **A second container on the same platform** (e.g. a separate Render private
-   service, or a Fly.io app in the same organization) running the official
-   `qdrant/qdrant` image, with `QDRANT_URL` pointing at its internal address. This is
-   what `docker-compose.yml` does for local/self-hosted use.
-2. **Qdrant Cloud's free tier** (a managed cluster, external to whichever platform
-   runs the API container) -- `QDRANT_URL` points at the cluster's HTTPS endpoint
-   instead. Simpler to operate (nothing to keep running yourself) at the cost of
-   depending on a third-party service's free-tier limits.
+1. **Qdrant Cloud's free tier** (a managed cluster, external to whichever platform
+   runs the API container) -- `QDRANT_URL` points at the cluster's HTTPS endpoint,
+   `QDRANT_API_KEY` authenticates to it (see `src/retrieval/vector_store_backends.py`).
+   Nothing to keep running yourself; this repo's **default** for both `render.yaml`
+   and `fly.toml`, because it keeps each config a single deployable service --
+   "a working config a visitor can actually click Deploy on" (per this section's own
+   design goal) beats a multi-service Blueprint that's harder to verify sight-unseen.
+2. **A second container on the same platform** (a separate Render private service,
+   or a second Fly.io app in the same organization) running the official
+   `qdrant/qdrant` image, with `QDRANT_URL` pointing at its internal address and no
+   `QDRANT_API_KEY` needed. This is what `docker-compose.yml` does for local/
+   self-hosted use, and is a reasonable alternative for a cloud deploy too -- it
+   just means adding a second service block to `render.yaml` / a second `fly.toml`
+   app yourself, following the same shape as the `qdrant` service in
+   `docker-compose.yml`.
 
-`render.yaml` in this repo defaults to option 1 (a second Render service running
-Qdrant) and notes option 2 as the alternative in a comment; `fly.toml` assumes the
-same pattern for a second Fly app. Switching between them is a `QDRANT_URL` change,
-nothing else.
+Switching between them is a `QDRANT_URL` (+ `QDRANT_API_KEY`) change, nothing else in
+the application code.
 
 ### Cost and rate-limit warning
 

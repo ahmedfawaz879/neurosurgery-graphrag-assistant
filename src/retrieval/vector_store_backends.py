@@ -28,7 +28,8 @@ def _build_qdrant_vector_store(config: Config) -> BasePydanticVectorStore:
     if config.QDRANT_MODE in (":memory:", ""):
         client = qdrant_client.QdrantClient(location=":memory:")
     else:
-        client = qdrant_client.QdrantClient(url=config.QDRANT_MODE)
+        # api_key is required for Qdrant Cloud, ignored by a self-hosted instance.
+        client = qdrant_client.QdrantClient(url=config.QDRANT_MODE, api_key=config.QDRANT_API_KEY or None)
     return QdrantVectorStore(client=client, collection_name=QDRANT_COLLECTION_NAME)
 
 
