@@ -1,0 +1,15 @@
+{
+  "G1": "External validation rarity",
+  "G2": "Geographic/domain benchmark concentration",
+  "G3": "Poor calibration reporting",
+  "G4": "Deployed-tool performance degradation",
+  "G5": "Unaudited ground-truth/label defensibility",
+  "G6": "Imaging-proxy vs. true operative ground truth mismatch",
+  "G7": "Scarce annotated skull-base surgical video",
+  "G8": "Need for federation on rare tumors",
+  "G9": "Disputed normative-connectome tool validity",
+  "G10": "Absent access-filter/referral-bias documentation",
+  "G11": "Unsolved real-time uncertainty quantification",
+  "G12": "Low TRIPOD+AI/CLAIM reporting-guideline adherence",
+  "G13": "Workflow-benefit vs. outcome-benefit conflation"
+}
